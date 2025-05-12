@@ -58,13 +58,59 @@ export class CreateEmployeeComponent implements OnInit {
   ngOnInit(): void {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(15)]],
-      email: [''],
+      email: ['', [Validators.required, CustomValidator.emailDomain('dell.com')]],
+      contactPreference: ['email'],
+      phone: [''],
       skills: this.fb.group({
-        skillName: [''],
-        experienceInYears: [''],
-        proficiency: ['intermediate']
+        skillName: ['', Validators.required],
+        experienceInYears: ['', Validators.required],
+        proficiency: ['', Validators.required]
       })
     })
+
+    this.employeeForm.get('contactPreference')?.valueChanges
+      .subscribe(data => {
+        this.onContactPrefernceChange(data);
+      })
+
+    this.employeeForm.valueChanges.subscribe(() => {
+      this.logValidationErrors(this.employeeForm);
+    })
+  }
+
+  logValidationErrors(group: FormGroup = this.employeeForm): void {
+    Object.keys(group.controls).forEach((key: string) => {
+      this.formErrors[key] = '';
+      const abstractControl = group.get(key);
+      if (abstractControl instanceof FormGroup) {
+        this.logValidationErrors(abstractControl);
+      } else {
+        if (abstractControl && abstractControl.invalid && (abstractControl.touched || abstractControl.dirty)) {
+          const messages = this.validationMessages[key];
+          for (const errorKey in abstractControl.errors) {
+            if (errorKey) {
+              this.formErrors[key] += messages[errorKey] + ' ';
+            }
+          }
+        }
+      }
+    });
+  }
+
+  onContactPrefernceChange(selectedContactType: string) {
+    const emailFormControl = this.employeeForm.get('email');
+    const phoneFormControl = this.employeeForm.get('phone');
+    if (emailFormControl && phoneFormControl) {
+      if (selectedContactType === 'phone') {
+        emailFormControl.clearValidators();
+        phoneFormControl.setValidators(Validators.required);
+      } else if (selectedContactType === 'mail') {
+        emailFormControl.setValidators(Validators.required);
+        phoneFormControl.clearValidators();
+      }
+      emailFormControl.updateValueAndValidity();
+      phoneFormControl.updateValueAndValidity();
+    }
   }
 
   getControlStatus(controName: string) {
@@ -83,24 +129,8 @@ export class CreateEmployeeComponent implements OnInit {
   }
 
   onLoadData() {
-    // this.employeeForm.setValue({
-    //   fullName: 'Pragim Technologies',
-    //   email: 'pragim@pragimtech.com',
-    //   skills: {
-    //     skillName: 'C#',
-    //     experienceInYears: 5,
-    //     proficiency: 'beginner'
-    //   }
-    // });
-    this.employeeForm.patchValue({
-      fullName: 'Pragim Technologies',
-      email: 'pragim@pragimtech.com',
-      skills: {
-        skillName: 'C#',
-        experienceInYears: 5,
-        proficiency: 'beginner'
-      }
-    });
+    // this.logValidationErrors(this.employeeForm);
+    // console.log("this.formErrors: ", this.formErrors);
   }
 
   onSubmit() {

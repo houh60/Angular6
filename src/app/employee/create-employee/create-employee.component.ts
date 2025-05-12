@@ -67,6 +67,21 @@ export class CreateEmployeeComponent implements OnInit {
     })
   }
 
+  getControlStatus(controName: string) {
+    const el = this.employeeForm.get(controName);
+    return el && (el.touched || el.dirty) && el.errors;
+  }
+
+  getErrorsRequired(controName: string) {
+    const el = this.employeeForm.get(controName);
+    return el && el.errors && el.errors['required'];
+  }
+
+  getErrorsLength(controName: string) {
+    const el = this.employeeForm.get(controName);
+    return el && el.errors && (el.errors['minlength'] || el.errors['maxlength']);
+  }
+
   onLoadData() {
     // this.employeeForm.setValue({
     //   fullName: 'Pragim Technologies',

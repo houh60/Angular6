@@ -5,10 +5,14 @@
     </div>
 
     <div class="panel-body">
-      <div class="form-group">
+      <div class="form-group" [ngClass]="{ 'has-error': getControlStatus('fullName') }">
         <label class="col-sm-2 control-label" for="fullName">Full Name</label>
         <div class="col-sm-8">
-          <input id="fullName" formControlName="fullName" type="text" class="form-control" />
+          <input id="fullName" type="text" class="form-control" formControlName="fullName" />
+          <span class="help-block" *ngIf="getControlStatus('fullName')">
+            <span *ngIf="getErrorsRequired('fullName')"> Full Name is required </span>
+            <span *ngIf="getErrorsLength('fullName')"> Full Name must be greater than 2 characters and less than 15 characters </span>
+          </span>
         </div>
       </div>
 
@@ -71,15 +75,15 @@
       valid : {{ employeeForm.valid }} <br />
     </td>
     <td style="padding: 10px">
-      touched : {{ employeeForm.get('fullName')?.touched }} <br />
-      dirty : {{ employeeForm.get('fullName')?.dirty }} <br />
-      valid : {{ employeeForm.get('fullName')?.valid }} <br />
+      touched : {{ this.employeeForm.get('fullName')?.touched }} <br />
+      dirty : {{ this.employeeForm.get('fullName')?.dirty }} <br />
+      valid : {{ this.employeeForm.get('fullName')?.valid }} <br />
     </td>
   </tr>
 </table>
 
 <br />
-FullName Value : {{ employeeForm.get('fullName')?.value }}
+FullName Value : {{ this.employeeForm.get('fullName')?.value }}
 <br />
 <br />
 Form Values :

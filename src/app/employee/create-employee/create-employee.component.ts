@@ -45,15 +45,15 @@ export class CreateEmployeeComponent implements OnInit {
   };
 
   formErrors: any = {
-    'fullName': '',
-    'emailGroup': '',
-    'email': '',
-    'emailMismatch': '',
-    'confirmEmail': '',
-    'phone': '',
-    'skillName': '',
-    'experienceInYears': '',
-    'proficiency': '',
+    fullName: '',
+    emailGroup: '',
+    email: '',
+    emailMismatch: '',
+    confirmEmail: '',
+    phone: '',
+    skillName: '',
+    experienceInYears: '',
+    proficiency: '',
   };
 
   constructor(

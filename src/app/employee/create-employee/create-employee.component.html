@@ -1,4 +1,4 @@
-<form [formGroup]="employeeForm" class="form-horizontal">
+<form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="form-horizontal">
   <div class="panel panel-primary">
     <div class="panel-heading">
       <h3 class="panel-title">Create Employee</h3>
@@ -18,10 +18,69 @@
           <input id="email" type="text" formControlName="email" class="form-control" />
         </div>
       </div>
+
+      <div formGroupName="skills">
+        <div class="form-group">
+          <label class="col-sm-2 control-label" for="skillName">Skill</label>
+          <div class="col-sm-4">
+            <input type="text" class="form-control" id="skillName" placeholder="Name" formControlName="skillName" />
+          </div>
+          <div class="col-sm-4">
+            <input type="text" placeholder="Experience in Years" class="form-control" formControlName="experienceInYears" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-2 control-label">Proficiency</label>
+          <div class="col-md-8">
+            <label class="radio-inline">
+              <input id="proficiency" type="radio" value="beginner" formControlName="proficiency" />
+              Beginner
+            </label>
+            <label class="radio-inline">
+              <input id="proficiency" type="radio" value="intermediate" formControlName="proficiency" />
+              Intermediate
+            </label>
+            <label class="radio-inline">
+              <input id="proficiency" type="radio" value="advanced" formControlName="proficiency" />
+              Advanced
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="panel-footer">
-      <button class="btn btn-primary" type="submit">Save</button>
+      <div class="btn-toolbar">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-primary" type="button" (click)="onLoadData()">Load Data</button>
+      </div>
     </div>
   </div>
 </form>
+
+<table border="1">
+  <tr>
+    <th style="padding: 10px">FormGroup</th>
+    <th style="padding: 10px">FormControl (fullName)</th>
+  </tr>
+  <tr>
+    <td style="padding: 10px">
+      touched : {{ employeeForm.touched }} <br />
+      dirty : {{ employeeForm.dirty }} <br />
+      valid : {{ employeeForm.valid }} <br />
+    </td>
+    <td style="padding: 10px">
+      touched : {{ employeeForm.get('fullName')?.touched }} <br />
+      dirty : {{ employeeForm.get('fullName')?.dirty }} <br />
+      valid : {{ employeeForm.get('fullName')?.valid }} <br />
+    </td>
+  </tr>
+</table>
+
+<br />
+FullName Value : {{ employeeForm.get('fullName')?.value }}
+<br />
+<br />
+Form Values :
+<pre>{{ employeeForm.value | json }}</pre>

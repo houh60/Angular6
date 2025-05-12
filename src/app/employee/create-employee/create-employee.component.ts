@@ -56,9 +56,39 @@ export class CreateEmployeeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.employeeForm = new FormGroup({
-      fullName: new FormControl(),
-      email: new FormControl(),
+    this.employeeForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(15)]],
+      email: [''],
+      skills: this.fb.group({
+        skillName: [''],
+        experienceInYears: [''],
+        proficiency: ['intermediate']
+      })
     })
+  }
+
+  onLoadData() {
+    // this.employeeForm.setValue({
+    //   fullName: 'Pragim Technologies',
+    //   email: 'pragim@pragimtech.com',
+    //   skills: {
+    //     skillName: 'C#',
+    //     experienceInYears: 5,
+    //     proficiency: 'beginner'
+    //   }
+    // });
+    this.employeeForm.patchValue({
+      fullName: 'Pragim Technologies',
+      email: 'pragim@pragimtech.com',
+      skills: {
+        skillName: 'C#',
+        experienceInYears: 5,
+        proficiency: 'beginner'
+      }
+    });
+  }
+
+  onSubmit() {
+    console.log("this.employeeForm: ", this.employeeForm);
   }
 }

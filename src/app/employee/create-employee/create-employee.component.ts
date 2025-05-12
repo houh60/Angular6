@@ -11,6 +11,8 @@ import { CustomValidator } from '../../shared/custom.validator';
 export class CreateEmployeeComponent implements OnInit {
   employeeForm!: FormGroup;
 
+  requiredDomainName = 'yahoo.com';
+
   validationMessages: any = {
     fullName: {
       'required': 'Full Name is required.',
@@ -19,13 +21,15 @@ export class CreateEmployeeComponent implements OnInit {
     },
     email: {
       'required': 'Email is required.',
-      'emailDoman': 'Email domain should be dell.com'
+      'emailDoman': `Email domain should be ${this.requiredDomainName}`
     },
     confirmEmail: {
       'required': 'Confirm Email is required.',
-      'emailDoman': 'Email domain should be dell.com'
+      'emailDoman': `Email domain should be ${this.requiredDomainName}`
     },
-    emailGroup: 'Email and confirm email do not match',
+    emailGroup: {
+      emailMismatch: 'Email and confirm email do not match'
+    },
     phone: {
       'required': 'Phone is required.'
     },
@@ -42,13 +46,14 @@ export class CreateEmployeeComponent implements OnInit {
 
   formErrors: any = {
     'fullName': '',
+    'emailGroup': '',
     'email': '',
+    'emailMismatch': '',
+    'confirmEmail': '',
     'phone': '',
     'skillName': '',
     'experienceInYears': '',
     'proficiency': '',
-    'confirmEmail': '',
-    'emailGroup': ''
   };
 
   constructor(
@@ -58,7 +63,10 @@ export class CreateEmployeeComponent implements OnInit {
   ngOnInit(): void {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(15)]],
-      email: ['', [Validators.required, CustomValidator.emailDomain('dell.com')]],
+      emailGroup: this.fb.group({
+        email: ['', [Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]],
+        confirmEmail: ['', [Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]],
+      }, { validator: matchEmail }),
       contactPreference: ['email'],
       phone: [''],
       skills: this.fb.group({
@@ -82,33 +90,36 @@ export class CreateEmployeeComponent implements OnInit {
     Object.keys(group.controls).forEach((key: string) => {
       this.formErrors[key] = '';
       const abstractControl = group.get(key);
-      if (abstractControl instanceof FormGroup) {
-        this.logValidationErrors(abstractControl);
-      } else {
-        if (abstractControl && abstractControl.invalid && (abstractControl.touched || abstractControl.dirty)) {
-          const messages = this.validationMessages[key];
-          for (const errorKey in abstractControl.errors) {
-            if (errorKey) {
-              this.formErrors[key] += messages[errorKey] + ' ';
-            }
+      if (abstractControl && abstractControl.invalid && (abstractControl.touched || abstractControl.dirty)) {
+        const messages = this.validationMessages[key];
+        for (const errorKey in abstractControl.errors) {
+          if (errorKey) {
+            this.formErrors[key] += messages[errorKey] + ' ';
           }
         }
+      }
+      if (abstractControl instanceof FormGroup) {
+        this.logValidationErrors(abstractControl);
       }
     });
   }
 
   onContactPrefernceChange(selectedContactType: string) {
     const emailFormControl = this.employeeForm.get('email');
+    const confirmEmailFormControl = this.employeeForm.get('confirmEmail');
     const phoneFormControl = this.employeeForm.get('phone');
-    if (emailFormControl && phoneFormControl) {
+    if (emailFormControl && confirmEmailFormControl && phoneFormControl) {
       if (selectedContactType === 'phone') {
         emailFormControl.clearValidators();
+        confirmEmailFormControl.clearValidators();
         phoneFormControl.setValidators(Validators.required);
-      } else if (selectedContactType === 'mail') {
-        emailFormControl.setValidators(Validators.required);
+      } else if (selectedContactType === 'email') {
+        emailFormControl.setValidators([Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]);
+        confirmEmailFormControl.setValidators([Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]);
         phoneFormControl.clearValidators();
       }
       emailFormControl.updateValueAndValidity();
+      confirmEmailFormControl.updateValueAndValidity();
       phoneFormControl.updateValueAndValidity();
     }
   }
@@ -135,5 +146,16 @@ export class CreateEmployeeComponent implements OnInit {
 
   onSubmit() {
     console.log("this.employeeForm: ", this.employeeForm);
+  }
+}
+
+function matchEmail(group: AbstractControl): { [key: string]: any } | null {
+  const emailControl = group.get('email');
+  const confirmEmailControl = group.get('confirmEmail');
+  if (emailControl?.value === confirmEmailControl?.value || confirmEmailControl?.pristine) {
+    return null;
+  }
+  else {
+    return { 'emailMismatch': true };
   }
 }

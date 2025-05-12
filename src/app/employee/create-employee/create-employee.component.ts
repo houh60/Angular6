@@ -11,7 +11,7 @@ import { CustomValidator } from '../../shared/custom.validator';
 export class CreateEmployeeComponent implements OnInit {
   employeeForm!: FormGroup;
 
-  requiredDomainName = 'yahoo.com';
+  requiredDomainName = 'dell.com';
 
   validationMessages: any = {
     fullName: {

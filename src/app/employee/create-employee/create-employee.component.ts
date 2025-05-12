@@ -1,0 +1,64 @@
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { CustomValidator } from '../../shared/custom.validator';
+
+@Component({
+  selector: 'app-create-employee',
+  standalone: false,
+  templateUrl: './create-employee.component.html',
+  styleUrl: './create-employee.component.css'
+})
+export class CreateEmployeeComponent implements OnInit {
+  employeeForm!: FormGroup;
+
+  validationMessages: any = {
+    fullName: {
+      'required': 'Full Name is required.',
+      'minlength': 'Full Name must be greater than 2 characters.',
+      'maxlength': 'Full Name must be less than 15 characters.'
+    },
+    email: {
+      'required': 'Email is required.',
+      'emailDoman': 'Email domain should be dell.com'
+    },
+    confirmEmail: {
+      'required': 'Confirm Email is required.',
+      'emailDoman': 'Email domain should be dell.com'
+    },
+    emailGroup: 'Email and confirm email do not match',
+    phone: {
+      'required': 'Phone is required.'
+    },
+    skillName: {
+      'required': 'Skill Name is required.',
+    },
+    experienceInYears: {
+      'required': 'Experience is required.',
+    },
+    proficiency: {
+      'required': 'Proficiency is required.',
+    },
+  };
+
+  formErrors: any = {
+    'fullName': '',
+    'email': '',
+    'phone': '',
+    'skillName': '',
+    'experienceInYears': '',
+    'proficiency': '',
+    'confirmEmail': '',
+    'emailGroup': ''
+  };
+
+  constructor(
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.employeeForm = new FormGroup({
+      fullName: new FormControl(),
+      email: new FormControl(),
+    })
+  }
+}

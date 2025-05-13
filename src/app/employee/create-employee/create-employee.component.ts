@@ -33,28 +33,9 @@ export class CreateEmployeeComponent implements OnInit {
     phone: {
       'required': 'Phone is required.'
     },
-    skillName: {
-      'required': 'Skill Name is required.',
-    },
-    experienceInYears: {
-      'required': 'Experience is required.',
-    },
-    proficiency: {
-      'required': 'Proficiency is required.',
-    },
   };
 
-  formErrors: any = {
-    fullName: '',
-    emailGroup: '',
-    email: '',
-    emailMismatch: '',
-    confirmEmail: '',
-    phone: '',
-    skillName: '',
-    experienceInYears: '',
-    proficiency: '',
-  };
+  formErrors: any = {};
 
   constructor(
     private fb: FormBuilder
@@ -69,11 +50,9 @@ export class CreateEmployeeComponent implements OnInit {
       }, { validator: matchEmail }),
       contactPreference: ['email'],
       phone: [''],
-      skills: this.fb.group({
-        skillName: ['', Validators.required],
-        experienceInYears: ['', Validators.required],
-        proficiency: ['', Validators.required]
-      })
+      skills: this.fb.array([
+        this.addSkillFormGroup()
+      ])
     })
 
     this.employeeForm.get('contactPreference')?.valueChanges
@@ -84,6 +63,32 @@ export class CreateEmployeeComponent implements OnInit {
     this.employeeForm.valueChanges.subscribe(() => {
       this.logValidationErrors(this.employeeForm);
     })
+  }
+
+  addSkillButtonClicked() {
+    (this.employeeForm.get('skills') as FormArray).push(this.addSkillFormGroup())
+  }
+
+  addSkillFormGroup(): FormGroup {
+    return this.fb.group({
+      skillName: ['', Validators.required],
+      experienceInYears: ['', Validators.required],
+      proficiency: ['', Validators.required]
+    })
+  }
+
+  getSkillFormControls() {
+    return (this.employeeForm.get('skills') as FormArray).controls
+  }
+
+  getStatus(group: any, key: any) {
+    const g = group.get(key);
+    return g && g.invalid && g.touched
+  }
+
+  getErrors(group: any, key: any) {
+    const g = group.get(key);
+    return g && g.touched && g.errors && g.errors['required']
   }
 
   logValidationErrors(group: FormGroup = this.employeeForm): void {
@@ -105,43 +110,41 @@ export class CreateEmployeeComponent implements OnInit {
   }
 
   onContactPrefernceChange(selectedContactType: string) {
-    const emailFormControl = this.employeeForm.get('email');
-    const confirmEmailFormControl = this.employeeForm.get('confirmEmail');
     const phoneFormControl = this.employeeForm.get('phone');
-    if (emailFormControl && confirmEmailFormControl && phoneFormControl) {
-      if (selectedContactType === 'phone') {
-        emailFormControl.clearValidators();
-        confirmEmailFormControl.clearValidators();
-        phoneFormControl.setValidators(Validators.required);
-      } else if (selectedContactType === 'email') {
-        emailFormControl.setValidators([Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]);
-        confirmEmailFormControl.setValidators([Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]);
-        phoneFormControl.clearValidators();
-      }
-      emailFormControl.updateValueAndValidity();
-      confirmEmailFormControl.updateValueAndValidity();
-      phoneFormControl.updateValueAndValidity();
+
+    const emailFormGroup = this.employeeForm.get('emailGroup');
+    const emailFormControl = emailFormGroup?.get('email');
+    const confirmEmailFormControl = emailFormGroup?.get('confirmEmail');
+
+    if (selectedContactType === 'phone') {
+      emailFormControl?.clearValidators();
+      confirmEmailFormControl?.clearValidators();
+      phoneFormControl?.setValidators(Validators.required);
+    } else if (selectedContactType === 'email') {
+      emailFormControl?.setValidators([Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]);
+      confirmEmailFormControl?.setValidators([Validators.required, CustomValidator.emailDomain(this.requiredDomainName)]);
+      phoneFormControl?.clearValidators();
     }
-  }
-
-  getControlStatus(controName: string) {
-    const el = this.employeeForm.get(controName);
-    return el && (el.touched || el.dirty) && el.errors;
-  }
-
-  getErrorsRequired(controName: string) {
-    const el = this.employeeForm.get(controName);
-    return el && el.errors && el.errors['required'];
-  }
-
-  getErrorsLength(controName: string) {
-    const el = this.employeeForm.get(controName);
-    return el && el.errors && (el.errors['minlength'] || el.errors['maxlength']);
+    emailFormControl?.updateValueAndValidity();
+    confirmEmailFormControl?.updateValueAndValidity();
+    phoneFormControl?.updateValueAndValidity();
   }
 
   onLoadData() {
-    // this.logValidationErrors(this.employeeForm);
-    // console.log("this.formErrors: ", this.formErrors);
+    const formArray = new FormArray([
+      new FormControl('John', Validators.required),
+      new FormGroup({
+        country: new FormControl('', Validators.required),
+      }),
+      new FormArray([]),
+    ]);
+
+    const formGroup = this.fb.group([
+      new FormControl('John', Validators.required),
+      new FormControl('IT', Validators.required),
+      new FormControl('Male', Validators.required),
+    ]);
+
   }
 
   onSubmit() {

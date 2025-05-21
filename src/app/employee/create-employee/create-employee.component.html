@@ -64,17 +64,24 @@
       <div class="well">
         <div class="form-group">
           <div class="col-md-offset-2 col-md-4">
-            <button type="button" class="btn btn-primary" (click)="addSkillButtonClicked()">Add Skill</button>
+            <button type="button" class="btn btn-primary" (click)="addSkillButtonClicked()" [disabled]="employeeForm.get('skills')?.invalid">Add Skill</button>
           </div>
         </div>
 
         <div formArrayName="skills" *ngFor="let skill of getSkillFormControls(); index as i">
+          <hr *ngIf="i > 0" />
           <div [formGroupName]="i">
             <div class="form-group" [ngClass]="{ 'has-error': getStatus(skill, 'skillName') }">
               <label class="col-sm-2 control-label" [attr.for]="'skillName' + i"> Skill </label>
               <div class="col-sm-4">
                 <input type="text" class="form-control" [id]="'skillName' + i" formControlName="skillName" placeholder="C#, Java, Angular etc..." />
                 <span class="help-block" *ngIf="getErrors(skill, 'skillName')"> Skill Name is required </span>
+              </div>
+
+              <div class="col-sm-6" *ngIf="getNumberOfSkills() > 1">
+                <button class="btn btn-danger btn-sm pull-right" title="Delete Skill" (click)="onRemoveSkill(i)">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
               </div>
             </div>
 

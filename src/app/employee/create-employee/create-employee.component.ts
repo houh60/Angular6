@@ -91,6 +91,14 @@ export class CreateEmployeeComponent implements OnInit {
     return g && g.touched && g.errors && g.errors['required']
   }
 
+  getNumberOfSkills() {
+    return (this.employeeForm.get('skills') as FormArray).length
+  }
+
+  onRemoveSkill(index: number) {
+    (this.employeeForm.get('skills') as FormArray).removeAt(index);
+  }
+
   logValidationErrors(group: FormGroup = this.employeeForm): void {
     Object.keys(group.controls).forEach((key: string) => {
       this.formErrors[key] = '';
